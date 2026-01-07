@@ -184,18 +184,6 @@ def get_client_ip():
     return ip
 
 
-def generate_unique_id(length=8):
-    characters = string.ascii_letters + string.digits
-    return "".join(random.choices(characters, k=length))
-
-
-def get_unique_custom_id():
-    while True:
-        new_id = generate_unique_id()
-        if not Fanfic.query.filter_by(custom_id=new_id).first():
-            return new_id
-
-
 def log_ip(action):
     user_id = session.get("user_id")
     if not user_id:
@@ -570,22 +558,39 @@ def delete_fanfic(fanfic_id):
 
 @app.route("/kudo/<int:fid>", methods=["POST"])
 def add_kudo(fid):
-    if g.current_user is None:
+    print("----- START add_kudo -----")
+
+    # Check if user is logged in
+    if not logged_in():
+        print("User not logged in. Redirecting to login page.")
         return redirect(url_for("login"))
+    else:
+        print("User is logged in.")
 
     user = g.current_user
+    print(f"Current user: ID={user.id}, Username={user.username}")
+
+    # Check if kudos already exists
     existing_kudo = Kudos.query.filter_by(
         user_id=user.id, item_type="fanfic", item_id=fid
     ).first()
 
-    if not existing_kudo:
-        new_kudo = Kudos(user_id=user.id, item_type="fanfic", item_id=fid)
-        db.session.add(new_kudo)
-        db.session.commit()
-        log_ip(action="kudo")
-    else:
-        pass
+    print(f"Existing kudo record: {existing_kudo}")
 
+    if not existing_kudo:
+        print("No existing kudo found. Creating new one.")
+        new_kudo = Kudos(user_id=user.id, item_type="fanfic", item_id=fid)
+        try:
+            db.session.add(new_kudo)
+            db.session.commit()
+            print("Successfully added new kudos.")
+        except Exception as e:
+            print(f"Error adding kudos: {e}")
+            db.session.rollback()
+    else:
+        print("Kudo already exists for this user and fanfic.")
+
+    print(f"Redirecting to fanfic view with ID={fid}")
     return redirect(url_for("view_fanfic", id=fid))
 
 

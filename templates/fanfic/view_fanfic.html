@@ -80,7 +80,7 @@
                         method="POST"
                         action="{{ url_for('add_kudo', fid=fanfic.id) }}"
 
-                    >
+                    ><input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                         <br />
                         <button class="btn" type="submit">Give Kudos</button>
