@@ -1,0 +1,22 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container-2">
+    <h1>Your Notes</h1>
+    <ul>
+        {% for note in notes %}
+        <li style="list-style: none">
+            <div class="fanfic-card">
+                <a href="{{ url_for('view_note', note_id=note.id) }}"
+                    ><h3>{{ note.content | truncate(50) }}</h3></a
+                >
+                <small id="date">{{ note.created_at | nice_date }} UTC</small>
+            </div>
+        </li>
+        {% else %}
+        <li>No notes yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('new_note') }}"
+        ><button class="btn">Add New Note</button></a
+    >
+</div>
+{% endblock %}

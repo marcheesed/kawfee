@@ -1,0 +1,97 @@
+{% extends 'layout.html' %} {% block content %}
+<head>
+    {% if user.custom_css %}
+    <style>
+        {{ user.custom_css|safe }}
+    </style>
+    {% endif %}
+</head>
+<body>
+    <div id="full-container" class="container-2">
+        <div id="inner-container" class="container-2">
+            <h1 id="profile-header">{{ user.username }}'s Profile</h1>
+            <div id="profile-flex">
+                {% if user.pfp %}
+                <img
+                    src="{{ url_for('static', filename='profile_pics/' + user.pfp) }}"
+                    alt="Profile Picture"
+                    class="pfp"
+                    id="pfp"
+                />
+                {% else %}
+                <img
+                    src="{{ url_for('static', filename='default_pfp.png') }}"
+                    alt="Default Profile Picture"
+                    class="pfp"
+                    id="pfp"
+                />
+                {% endif %}
+                <div
+                    style="
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                    "
+                >
+                    <div class="badges-container">
+                        {% for badge in user.badges %}
+                        <div class="badge-containment">
+                            {% if badge.icon_url %}
+                            <img
+                                src="{{ badge.icon_url }}"
+                                alt="{{ badge.name }}"
+                                width="24"
+                                height="24"
+                            />
+                            {% endif %}
+                        </div>
+
+                        {% endfor %}
+                    </div>
+
+                    <div id="bio" class="user-bio">{{ user.bio|safe }}</div>
+                </div>
+            </div>
+            <div class="fanfics-profile">
+                <h2 id="fanfic-header">Fanfics by {{ user.username }}</h2>
+                <div class="fanfic-list">
+                    {% for fanfic in fanfics %}
+                    <div id="fanfic-card" class="fanfic-card">
+                        <h3>
+                            <a
+                                id="fanfic-title"
+                                href="{{ url_for('view_fanfic', id=fanfic.id) }}"
+                                >{{ fanfic.title }}</a
+                            >
+                        </h3>
+                        <div id="fanfic-info" class="fanfic-info">
+                            <p id="age-rating">
+                                Age Rating: {{ fanfic.age_rating }}
+                            </p>
+                            <p id="fandom">Fandom: {{ fanfic.fandom }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="pagination">
+                    {% if page > 1 %}
+                    <a
+                        href="{{ url_for('profile', username=user.username, page=page-1) }}"
+                        >Previous</a
+                    >
+                    {% endif %}
+                    <span>Page {{ current_page }} of {{ total_pages }}</span>
+
+                    {% if page < total_pages %}
+                    <a
+                        href="{{ url_for('profile', username=user.username, page=page+1) }}"
+                        >Next</a
+                    >
+                    {% endif %}
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</body>

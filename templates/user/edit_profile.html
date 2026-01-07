@@ -1,0 +1,78 @@
+<!doctype html>
+{% extends "layout.html" %} {% block content %}
+<html>
+    <head>
+    </head>
+    <body>
+        <div class="container-2">
+            <div class="container-2">
+            <div id="profile-flex">
+                {% if user.pfp %}
+                <img
+                    src="{{ url_for('static', filename='profile_pics/' + user.pfp) }}"
+                    alt="Profile Picture"
+                    class="pfp"
+                />
+                {% else %}
+                <img
+                    src="{{ url_for('static', filename='default_pfp.png') }}"
+                    alt="Profile Picture"
+                    class="pfp"
+                />
+                {% endif %}
+                <div id="profile-flex-two">
+                <form method="POST" enctype="multipart/form-data">
+                    <div style="display: flex; align-items: center; gap: 15px">
+                        <div>
+
+                            <input style="margin-bottom:10px" type="text" id="username" name="username" placeholder="username" value="{{ user.username }}">
+                          </div>
+
+
+                    </div>
+                    <textarea name="bio" id="bio" rows="10" cols="20">{{ user.bio }}</textarea>
+                </div>
+            </div>
+            <br>
+            <div style="display: flex; justify-content: space-between;">
+            <input
+                type="file"
+                name="pfp"
+                id="pfp"
+            />
+            <button class="btn" type="submit">save changes</button>
+            </div>
+
+
+            <label for="custom_css">custom css</label><br />
+            <textarea
+                name="custom_css"
+                id="custom_css"
+                rows="5"
+                cols="30"
+                placeholder="enter your custom CSS here..."
+            >{{ user.custom_css }}</textarea><br /><br />
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            />
+
+        </form>
+        <div style="display:flex; justify-content:space-between">
+        <a href="{{ url_for('profile', username=user.username) }}"
+            ><button class="btn">back to profile</button></a
+        >
+<div>
+
+    <a href="{{ url_for('settings', username=user.username) }}"
+        ><button class="btn">settings</button></a
+    >
+</div>
+        </div>
+            </div>
+        </div>
+            {% endblock %}
+
+    </body>
+</html>

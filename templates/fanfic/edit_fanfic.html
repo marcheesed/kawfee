@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+<title>Edit Fic: {{ fanfic.title }}</title>
+</head>
+<body>
+<div class="full-container">
+         {% extends "layout.html" %}{% block content %}
+    <div class="container-1">
+        <h1>Edit {{ fanfic.title }}</h1>
+        <form method="POST" id="edit-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label>Title</label><br />
+            <input type="text" name="title" value="{{ fanfic.title }}" required /><br />
+
+            <label>Fandom</label><br />
+            <input type="text" name="fandom" value="{{ fanfic.fandom }}" required /><br />
+            {% set first_chapter = chapters[0] if chapters and chapters|length > 0 else {'title': '', 'content': ''} %}
+
+
+            <label>Content</label><br />
+           <textarea name="content" rows="10">{{ fanfic.content }}</textarea>
+
+            <div class="submit-tags">
+                <div class="tags-input-container" style="margin-top: 20px;">
+                    <label for="tags-input">Tags</label><br />
+                    <input
+                        type="text"
+                        id="tags-input"
+                        placeholder="Type tags and press Enter or comma"
+                        autocomplete="off"
+                    />
+                    <div id="tags-container" style="margin-top: 10px;"></div>
+                    <input type="hidden" name="tags" id="tags-hidden" />
+                </div>
+                <br />
+
+                <label for="age_rating">Age Rating:</label>
+                <select name="age_rating" id="age_rating" required>
+                    <option value="">Select age rating</option>
+                    <option value="18+" {% if fanfic.age_rating == "18+" %}selected{% endif %}>18+</option>
+                    <option value="16+" {% if fanfic.age_rating == "16+" %}selected{% endif %}>16+</option>
+                    <option value="13+" {% if fanfic.age_rating == "13+" %}selected{% endif %}>13+</option>
+                </select>
+                <br /><br />
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    <script>
+    const initialTags = {{ tags | tojson }};
+    let tags = [...initialTags];
+
+    const tagsInput = document.getElementById("tags-input");
+    const tagsContainer = document.getElementById("tags-container");
+    const hiddenInput = document.getElementById("tags-hidden");
+    const form = document.getElementById("edit-form");
+
+    function updateHiddenInput() {
+        hiddenInput.value = tags.join(", ");
+    }
+
+    function addTag(tag) {
+        tag = tag.trim();
+        if (tag && !tags.includes(tag)) {
+            tags.push(tag);
+            renderTags();
+            updateHiddenInput();
+        }
+    }
+
+    function removeTag(tag) {
+        tags = tags.filter((t) => t !== tag);
+        renderTags();
+        updateHiddenInput();
+    }
+
+    function renderTags() {
+        tagsContainer.innerHTML = "";
+        tags.forEach((tag) => {
+            const span = document.createElement("span");
+            span.textContent = tag;
+            span.style.border = "1px solid #ccc";
+            span.style.borderRadius = "4px";
+            span.style.padding = "4px 8px";
+            span.style.margin = "4px";
+            span.style.display = "inline-block";
+            span.style.cursor = "pointer";
+            span.title = "Click to remove";
+            span.onclick = () => removeTag(tag);
+            tagsContainer.appendChild(span);
+        });
+    }
+
+    document.getElementById("tags-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            addTag(tagsInput.value);
+            tagsInput.value = "";
+        }
+    });
+
+    document.querySelector("#edit-form").addEventListener("submit", () => {
+        updateHiddenInput();
+    });
+
+    renderTags();
+
+    </script>
+    {% endblock %}
+</body>
+</html>

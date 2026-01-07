@@ -1,0 +1,92 @@
+{% extends 'layout.html' %} {% block content %}
+<div class="container-6">
+    <form method="get" action="/">
+        <input
+            id="search-input"
+            type="text"
+            name="search"
+            placeholder="Search fanfics..."
+            value="{{ request.args.get('search', '') }}"
+        />
+        <button class="btn" type="submit">Search</button>
+    </form>
+    <div class="container-4">
+        <div class="container-5">
+            {% if site_info %}
+            <div class="container-3">
+                <h1>{{ site_info.title }}</h1>
+                <div>
+                    {{ site_info.content | safe | truncate(235) }}
+                    <a href="{{ url_for('get_site_info') }}">read more..</a>
+                </div>
+            </div>
+            {% endif %}
+            <div class="container-3">
+                <h2>Top 5 Tags</h2>
+                <ul>
+                    {% for tag in top_tags %}
+                    <li>
+                        <div id="index-tags"><span>{{ tag.name }}</span></div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="socials" class="container-3">
+                <h3>Social Medias</h3>
+                <p>
+                    <a href="https://tetratto.com/@kawfee" target="_blank"
+                        ><img
+                            src="{{ url_for('static', filename='tetratto.svg') }}"
+                            alt="tetratto"
+                    /></a>
+                    ===
+                    <a href="https://blog.kawfee.net" target="_blank"
+                        ><img
+                            src="{{ url_for('static', filename='favicon.webp') }}"
+                            alt="blog"
+                        />
+                    </a>
+                </p>
+            </div>
+        </div>
+        {% for fanfic in fanfics %}
+        <div class="fanfic-container">
+            {% if fanfic is not none %}
+            <div class="fanfic-card">
+                <a
+                    id="fanfic-title"
+                    href="{{ url_for('view_fanfic', id=fanfic.id) }}"
+                >
+                    <h3>{{ fanfic.title }}</h3>
+                </a>
+                <p>
+                    Author:
+                    <a
+                        href="{{ url_for('profile', username=fanfic.author_id) }}"
+                    >
+                        {{ fanfic.author_id }}
+                    </a>
+                </p>
+                <p>Fandom: {{ fanfic.fandom }}</p>
+                <p>Rating: {{ fanfic.age_rating }}</p>
+            </div>
+            {% else %}
+            <p>Fanfic not available.</p>
+            {% endif %} {% else %}
+            <p>No fanfics found!</p>
+        </div>
+        {% endfor %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a href="{{ url_for('index', page=current_page - 1) }}">Previous</a>
+            {% endif %}
+
+            <span>Page {{ current_page }} of {{ total_pages }}</span>
+
+            {% if current_page < total_pages %}
+            <a href="{{ url_for('index', page=current_page + 1) }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

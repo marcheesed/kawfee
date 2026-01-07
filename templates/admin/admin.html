@@ -1,0 +1,11 @@
+{% extends "layout.html" %} {% block content %}
+<div style="text-align: center" class="container-2">
+    <h1>hi, admin {{ current_user.username }}!</h1>
+    <br />
+    <a href="{{ url_for('ip_logs') }}">ip logs</a> ===
+    <a href="{{ url_for('users') }}">users</a> ===
+    <a href="{{ url_for('fanfics') }}">fanfics</a> ===
+    <a href="{{ url_for('invite_codes') }}">invite codes</a> ===
+    <a href="{{ url_for('update_site_info') }}">change site info</a>
+</div>
+{% endblock %}

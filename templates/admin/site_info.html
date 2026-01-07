@@ -1,0 +1,18 @@
+<h1>Edit Site Info</h1>
+<form method="POST" action="/admin/site-info">
+    <label for="title">Title:</label><br />
+    <input
+        type="text"
+        id="title"
+        name="title"
+        value="{{ current_title }}"
+    /><br /><br />
+
+    <label for="content">Content:</label><br />
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <textarea id="content" name="content" rows="10" cols="50">
+{{ current_content }}</textarea
+    ><br /><br />
+
+    <button type="submit">Save</button>
+</form>

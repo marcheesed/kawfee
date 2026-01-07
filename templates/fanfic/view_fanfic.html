@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{ fanfic.title }}</title>
+    </head>
+    <body>
+        <div class="full-container-2">
+            {% extends "layout.html" %}{% block content %}
+            <div class="container-1">
+                <h1>{{ fanfic.title }}</h1>
+                <div style="display: flex; justify-content: space-between">
+                    <div>
+                        <span class="fanfic-stat">
+                            <p style="text-align: center">
+                                by <a href="{{ url_for('profile', username=fanfic.author_id) }}">{{ fanfic.author_id }}</a>
+                            </p>
+
+                            <p><strong>Fandom:</strong> {{ fanfic.fandom }}</p>
+                            <p>
+                                <strong>Age Rating:</strong> {{
+                                fanfic["age_rating"] }}
+                            </p></span
+                        >
+                    </div>
+                    <div style="width: 20%">
+                        <div class="flexy-wexy">
+                            {% if session['username'] == fanfic.author_id or current_user.is_admin %}
+                            <form action="{{ url_for('delete_fanfic', fanfic_id=fanfic.id) }}" method="POST" style="display:inline;">
+                                <button class="btn" type="submit" onclick="return confirm('Are you sure you want to delete this fanfic?');">Delete</button>
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                />
+                            </form>
+                                <a href="{{ url_for('edit_fanfic', id=fanfic.id) }}">
+                                    <button class="btn">Edit this Fanfic</button>
+                                </a>
+                            {% else %}
+                                <a href="https://stack.shrimpcamp.com/tickets/251396461063831552/new">
+                                    <button class="btn">Report Fic</button>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <h3 style="margin: 0 auto">Tags</h3>
+                        <p>
+                            {% for tag in fanfic.tags %}
+                            <span style=" margin-top: 8px">{{ tag.name }}</span>
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fic-main-content">
+                    <p
+                        class="fic-text"
+                        style="
+                            white-space: pre-wrap;
+                            padding-top: 20px;
+                            overflow-wrap: break-word;
+                        "
+                    >
+{{ fanfic.content | safe }}
+            </p
+                    >
+                    <h3>Kudos ({{ kudos|length }})</h3>
+                    {% if kudos|length > 0 %} {% if kudos|length > 2 %} {{ kudos[:2]
+                    | join(', ') }} and {{ kudos|length - 2 }} others have given
+                    kudos! {% elif kudos|length == 2 %} {{ kudos[0] }} and {{
+                    kudos[1] }} have given kudos! {% elif kudos|length == 1 %} {{
+                    kudos[0] }} has given kudos! {% endif %} {% else %}
+                    <p>No kudos yet.</p>
+                    {% endif %}
+
+                    <form
+                        id="name"
+                        method="POST"
+                        action="{{ url_for('add_kudo', fid=fanfic.id) }}"
+
+                    >
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        />
+                        <br />
+                        <button class="btn" type="submit">Give Kudos</button>
+                    </form>
+                    <hr style="margin-top:10px">
+                    <div id="comments-section">
+                      {% macro render_comments(comments) %}
+                        <ul class="reply-section">
+                          {% for item in comments %}
+                            <li>
+                              <div class="comment">
+                                  <div class="comment-flex">
+                                {% if item.comment.user.pfp %}
+                                <img
+                                  src="{{ url_for('static', filename='profile_pics/' + item.comment.user.pfp) }}"
+                                  alt="{{ item.comment.user.username }}'s profile picture"
+                                  class="pfp"
+                                  width="50"
+                                  height="50"
+                                />
+                                {% else %}
+                                <img
+                                  src="{{ url_for('static', filename='default_pfp.png') }}"
+                                  alt="Default profile picture"
+                                  class="pfp"
+                                  width="50"
+                                  height="50"
+                                />
+                                {% endif %}
+                                <p><strong>{{ item.comment.user.username }}</strong><br>
+                               <small>{{ item.comment.timestamp | nice_date }}</small></p>
+                                  </div>
+                                <p class="comment-text">
+                                  {{ item.comment.content }}
+                                </p>
+
+
+
+                                <form method="POST" action="{{ url_for('post_comment', id=fanfic.id) }}">
+                                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                  <input type="hidden" name="parent_id" value="{{ item.comment.id }}" />
+                                  <textarea placeholder="Write your reply here..." required name="content"></textarea>
+                                  <div class="reply-buttons">
+                                  <button class="btn" type="submit">Reply</button>
+                                </form>
+                                {% if current_user.is_authenticated and (current_user.id == item.comment.user_id or current_user.is_admin) %}
+                                    <a href="{{ url_for('edit_comment', comment_id=item.comment.id) }}" class="btn">Edit</a>
+                                {% endif %}
+
+</div>
+                              </div>
+                              {{ render_comments(item.replies) }}
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      {% endmacro %}
+
+                      {{ render_comments(comments) }}
+                    </div>
+                    <h3>Add a Comment</h3>
+                    <form style="margin-bottom: 10px;" method="POST" action="{{ url_for('post_comment', id=fanfic.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <textarea name="content" required placeholder="Write your comment here..."></textarea>
+                        <br />
+                        <button class="btn" type="submit">Post Comment</button>
+                    </form>
+        </div>
+        {% endblock %}
+    </body>
+</html>

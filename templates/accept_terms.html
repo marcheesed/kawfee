@@ -1,0 +1,25 @@
+{% extends 'layout.html' %} {% block content %}
+
+<div class="container-2">
+    <h1>Accept New Terms</h1>
+    <p>
+        The <a href="https://kawfee.net/privacy">Privacy Policy</a> or
+        <a href="https://kawfee.net/terms">Terms of Service</a> has been
+        updated! By continuing to use the site, and clicking the button below,
+        you agree to these changes. it's recommended that you read them
+        carefully.
+    </p>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button class="btn" type="submit">Accept</button>
+    </form>
+</div>
+<script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+        if (!document.getElementById("accept").checked) {
+            e.preventDefault();
+            alert("You must accept the terms to continue.");
+        }
+    });
+</script>
+{% endblock %}

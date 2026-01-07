@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{% block title %}Submit Fanfic{% endblock %}</title>
+    </head>
+    <body>
+        <div class="full-container">
+            {% extends 'layout.html' %} {% block content %}
+            <div class="container-2">
+                <h1>Submit a New Fanfic</h1>
+                <br />
+                <div class="submit-card">
+                    <form method="POST" id="fanfic-form">
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        />
+                        <input type="hidden" name="tags" id="tags-hidden" />
+
+                        <div class="submit-inputs">
+                            <div class="submit-title">
+                                <label>Title</label><br />
+                                <input type="text" name="title" required />
+                            </div>
+                            <div class="submit-title">
+                                <label>Fandom</label><br />
+                                <input type="text" name="fandom" required />
+                            </div>
+                        </div>
+
+                        <div class="submit-content">
+                            <label>Content</label><br />
+                            <textarea
+                                name="content"
+                                rows="10"
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div
+                            class="tags-input-container"
+                            style="margin-top: 20px"
+                        >
+                            <label for="tags-input">Tags</label><br />
+                            <input
+                                type="text"
+                                id="tags-input"
+                                placeholder="Type tags and press Enter or comma"
+                                autocomplete="off"
+                            />
+                            <div
+                                id="tags-container"
+                                style="margin-top: 10px; min-height: 30px"
+                            ></div>
+                        </div>
+
+                        <label for="age_rating" style="margin-top: 20px"
+                            >Age Rating:</label
+                        >
+                        <select id="age_rating" name="age_rating" required>
+                            <option value="">Select age rating</option>
+                            <option value="18+">18+</option>
+                            <option value="16+">16+</option>
+                            <option value="13+">13+</option>
+                        </select>
+
+                        <div class="foot" style="margin-top: 20px">
+                            <button class="btn" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                const initialTags = {{ tags | tojson }};
+                let tags = [...initialTags];
+
+                const tagsInput = document.getElementById("tags-input");
+                const tagsContainer = document.getElementById("tags-container");
+                const hiddenInput = document.getElementById("tags-hidden");
+                const newTagInput = document.getElementById("new-tag");
+                const form = document.getElementById("fanfic-form");
+
+                function updateHiddenInput() {
+                    hiddenInput.value = JSON.stringify(tags);
+                }
+
+                function addTag(tag) {
+                    tag = tag.trim();
+                    if (tag && !tags.includes(tag)) {
+                        tags.push(tag);
+                        renderTags();
+                        updateHiddenInput();
+                    }
+                }
+
+                function removeTag(tag) {
+                    tags = tags.filter((t) => t !== tag);
+                    renderTags();
+                    updateHiddenInput();
+                }
+
+                function renderTags() {
+                    tagsContainer.innerHTML = "";
+                    tags.forEach((tag) => {
+                        const span = document.createElement("span");
+                        span.textContent = tag;
+                        span.style.border = "1px solid #ccc";
+                        span.style.borderRadius = "4px";
+                        span.style.padding = "4px 8px";
+                        span.style.margin = "4px";
+                        span.style.display = "inline-block";
+                        span.style.cursor = "pointer";
+                        span.title = "Click to remove";
+                        span.onclick = () => removeTag(tag);
+                        tagsContainer.appendChild(span);
+                    });
+                }
+
+                tagsInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        addTag(tagsInput.value);
+                        tagsInput.value = "";
+                    }
+                });
+
+                form.addEventListener("submit", () => {
+                    updateHiddenInput();
+                });
+
+                renderTags();
+            </script>
+            {% endblock %}
+        </div>
+    </body>
+</html>

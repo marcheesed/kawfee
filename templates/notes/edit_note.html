@@ -1,0 +1,15 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container-1">
+    <h1>Edit Note</h1>
+    <form method="POST">
+        <textarea name="content" rows="10" cols="60">
+{{ note.content }}</textarea
+        ><br />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="note-flex">
+        <button class="btn" type="submit">Save Changes</button>
+    </form>
+    <a href="{{ url_for('view_note', note_id=note.id) }}"><button class="btn">Cancel</button></a>
+</div>
+</div>
+{% endblock %}
