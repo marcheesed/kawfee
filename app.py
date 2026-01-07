@@ -554,13 +554,10 @@ def delete_fanfic(fanfic_id):
 
 @app.route("/kudo/<int:fid>", methods=["POST"])
 def add_kudo(fid):
-    if not logged_in():
+    if g.current_user is None:
         return redirect(url_for("login"))
 
-    user = session.get("username")
-    if not user:
-        return redirect(url_for("login"))
-
+    user = g.current_user.username
     fanfic = Fanfic.query.get(fid)
     if not fanfic:
         abort(404)
