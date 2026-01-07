@@ -572,7 +572,7 @@ def add_kudo(fid):
         kudos_list.append(user)
         fanfic.kudos = json.dumps(kudos_list)
         db.session.commit()
-        log_ip(username=user, page=request.path, action="kudo")
+        log_ip(action="kudo")
     else:
         pass
 
