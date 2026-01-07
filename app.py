@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import random
 import re
@@ -6,7 +7,7 @@ import secrets
 import string
 from datetime import datetime, timezone
 from functools import wraps
-import math
+
 import bcrypt
 import bleach
 from bleach.css_sanitizer import CSSSanitizer
@@ -55,7 +56,7 @@ from properties import (
     allowed_tags,
 )
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 login_manager = LoginManager()
 login_manager.init_app(app)
 app.secret_key = "your-secret-key"
