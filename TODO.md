@@ -15,5 +15,4 @@ x comments
 x view_note
 x notes pathway
 x edit_note
-
-admin routes aka tables css
+x admin routes aka tables css
