@@ -64,21 +64,24 @@
             </p
                     >
                     <h3>Kudos ({{ kudos|length }})</h3>
-                    {% if kudos|length > 0 %} {% if kudos|length > 2 %} {{ kudos[:2]
-                    | join(', ') }} and {{ kudos|length - 2 }} others have given
-                    kudos! {% elif kudos|length == 2 %} {{ kudos[0] }} and {{
-                    kudos[1] }} have given kudos! {% elif kudos|length == 1 %} {{
-                    kudos[0] }} has given kudos! {% endif %} {% else %}
-                    <p>No kudos yet.</p>
+                    {% if kudos_usernames|length > 0 %}
+                        {% if kudos_usernames|length > 2 %}
+                            {{ kudos_usernames[:2]|join(', ') }} and {{ kudos_usernames|length - 2 }} others have given kudos!
+                        {% elif kudos_usernames|length == 2 %}
+                            {{ kudos_usernames[0] }} and {{ kudos_usernames[1] }} have given kudos!
+                        {% elif kudos_usernames|length == 1 %}
+                            {{ kudos_usernames[0] }} has given kudos!
+                        {% endif %}
+                    {% else %}
+                        <p>No kudos yet.</p>
                     {% endif %}
-
                     <form
                         id="name"
                         method="POST"
                         action="{{ url_for('add_kudo', fid=fanfic.id) }}"
 
                     >
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
                         <br />
                         <button class="btn" type="submit">Give Kudos</button>
                     </form>

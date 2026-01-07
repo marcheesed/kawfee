@@ -43,6 +43,7 @@ from models import (
     Fanfic,
     InviteCode,
     IPLog,
+    Kudos,
     Note,
     SiteInfo,
     Tag,
@@ -437,6 +438,17 @@ def upload_fanfic():
 @app.route("/fanfics/<int:id>", methods=["GET"])
 def view_fanfic(id):
     fanfic = Fanfic.query.get_or_404(id)
+
+    kudos_count = Kudos.query.filter_by(item_type="fanfic", item_id=id).count()
+
+    kudos_users = (
+        db.session.query(User)
+        .join(Kudos, User.id == Kudos.user_id)
+        .filter(Kudos.item_type == "fanfic", Kudos.item_id == id)
+        .all()
+    )
+    kudos_usernames = [user.username for user in kudos_users]
+
     comments_tree = get_comments_tree(id)
     for comment in comments_tree:
         timestamp_str = getattr(comment, "timestamp", None) or comment.get("timestamp")
@@ -455,7 +467,11 @@ def view_fanfic(id):
     log_ip(f"{visitor_username} viewed {fanfic.title}")
 
     return render_template(
-        "fanfic/view_fanfic.html", fanfic=fanfic, comments=comments_tree
+        "fanfic/view_fanfic.html",
+        fanfic=fanfic,
+        comments=comments_tree,
+        kudos_count=kudos_count,
+        kudos_usernames=kudos_usernames,
     )
 
 
@@ -557,26 +573,20 @@ def add_kudo(fid):
     if g.current_user is None:
         return redirect(url_for("login"))
 
-    user = g.current_user.username
-    fanfic = Fanfic.query.get(fid)
-    if not fanfic:
-        abort(404)
+    user = g.current_user
+    existing_kudo = Kudos.query.filter_by(
+        user_id=user.id, item_type="fanfic", item_id=fid
+    ).first()
 
-    kudos_json = fanfic.kudos
-    try:
-        kudos_list = json.loads(kudos_json) if kudos_json else []
-    except json.JSONDecodeError:
-        kudos_list = []
-
-    if user not in kudos_list:
-        kudos_list.append(user)
-        fanfic.kudos = json.dumps(kudos_list)
+    if not existing_kudo:
+        new_kudo = Kudos(user_id=user.id, item_type="fanfic", item_id=fid)
+        db.session.add(new_kudo)
         db.session.commit()
         log_ip(action="kudo")
     else:
         pass
 
-    return redirect(url_for("view_fic", fid=fid))
+    return redirect(url_for("view_fanfic", id=fid))
 
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
